@@ -1,0 +1,26 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+import Pagination from '../../components/Pagination.astro';
+import { getPublishedPosts, paginateItems } from '../../lib/posts';
+
+// 1 ページ目は "/" が担当するので、ここでは 2 ページ目以降だけを生成する。
+export const getStaticPaths: GetStaticPaths = async () => {
+  const pages = paginateItems(await getPublishedPosts());
+
+  return pages
+    .filter((p) => p.page > 1)
+    .map((p) => ({
+      params: { page: String(p.page) },
+      props: p,
+    }));
+};
+
+const { page, totalPages, items } = Astro.props;
+---
+
+<BaseLayout title={`${page}ページ目`} noindex>
+  <PostList posts={items} />
+  <Pagination base="/" page={page} totalPages={totalPages} />
+</BaseLayout>

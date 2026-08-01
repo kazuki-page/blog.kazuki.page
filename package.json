@@ -1,0 +1,29 @@
+{
+  "name": "blog.kazuki.page",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "link:content": "node scripts/link-content.mjs",
+    "validate": "node scripts/validate-content.ts",
+    "build": "npm run validate && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.1.6",
+    "markdown-it": "^15.0.0",
+    "sanitize-html": "^2.17.6"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "@types/sanitize-html": "^2.16.1",
+    "gray-matter": "^4.0.3",
+    "wrangler": "^4.118.0"
+  }
+}

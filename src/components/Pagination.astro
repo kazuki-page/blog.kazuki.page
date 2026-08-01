@@ -1,0 +1,53 @@
+---
+import { pageUrl } from '../lib/posts';
+
+interface Props {
+  /** ページネーションの基点となる URL（末尾スラッシュ込み）。例: "/", "/tags/weekly/" */
+  base: string;
+  page: number;
+  totalPages: number;
+}
+
+const { base, page, totalPages } = Astro.props;
+---
+
+{
+  totalPages > 1 && (
+    <nav class="pagination" aria-label="ページ送り">
+      {page > 1 ? (
+        <a href={pageUrl(base, page - 1)} rel="prev">
+          ← 新しい
+        </a>
+      ) : (
+        <span />
+      )}
+
+      <span class="status">
+        {page} / {totalPages}
+      </span>
+
+      {page < totalPages ? (
+        <a href={pageUrl(base, page + 1)} rel="next">
+          古い →
+        </a>
+      ) : (
+        <span />
+      )}
+    </nav>
+  )
+}
+
+<style>
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 3rem 0 1rem;
+    font-size: 0.9rem;
+  }
+
+  .status {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

@@ -1,0 +1,17 @@
+# Cloudflare Pages のレスポンスヘッダ設定。
+# 書式: パスパターンの次行以降にインデントしてヘッダを書く。
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  # ポリシーで「インラインフレームの使用はお断り」と明示しているため、埋め込みを禁止する
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Astro がハッシュ付きファイル名で出力する資産は、内容が変われば名前も変わるので長期キャッシュしてよい
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# フィードは短めに
+/rss.xml
+  Cache-Control: public, max-age=3600

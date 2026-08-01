@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedPosts } from '../../lib/posts';
+import { categories, categoryPath, type CategoryName } from '../../data/categories';
+
+const posts = await getPublishedPosts();
+
+const entries = (Object.keys(categories) as CategoryName[]).map((name) => ({
+  name,
+  ...categories[name],
+  count: posts.filter((p) => p.data.category === name).length,
+}));
+---
+
+<BaseLayout title="Categories" description="カテゴリの一覧。">
+  <h1>Categories</h1>
+
+  <ul class="taxonomy">
+    {
+      entries.map((category) => (
+        <li>
+          <a href={categoryPath(category.name)}>{category.name}</a>
+          <span class="count">{category.count}</span>
+          <p class="desc">{category.description}</p>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>
+
+<style>
+  .taxonomy {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+  }
+
+  .taxonomy li {
+    margin: 1.5rem 0;
+  }
+
+  .count {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-left: 0.5rem;
+  }
+
+  .desc {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin: 0.25rem 0 0;
+  }
+</style>

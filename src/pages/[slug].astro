@@ -1,0 +1,88 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPublishedPosts, postSlug, formatDate } from '../lib/posts';
+import { categoryPath } from '../data/categories';
+import { tagPath } from '../data/tags';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = await getPublishedPosts();
+
+  return posts.map((post) => ({
+    params: { slug: postSlug(post) },
+    props: { post },
+  }));
+};
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const { title, description, date, updated, category, tags, ogImage, draft } = post.data;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  ogImage={ogImage}
+  ogType="article"
+  publishedAt={date}
+  updatedAt={updated}
+  noindex={draft}
+>
+  <article>
+    <header class="post-header">
+      <h1>{title}</h1>
+      <p class="meta">
+        <time datetime={date.toISOString()}>{formatDate(date)}</time>
+        {updated && <span> / 更新 {formatDate(updated)}</span>}
+        <a href={categoryPath(category)}>{category}</a>
+      </p>
+      {
+        tags.length > 0 && (
+          <ul class="tags">
+            {tags.map((tag) => (
+              <li>
+                <a href={tagPath(tag)}>#{tag}</a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    <Content />
+  </article>
+</BaseLayout>
+
+<style>
+  .post-header {
+    margin-bottom: 3rem;
+  }
+
+  .post-header h1 {
+    margin-top: 0;
+  }
+
+  .meta {
+    color: var(--muted);
+    font-size: 0.85rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin: 0.5rem 0;
+  }
+
+  .tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0.5rem 0;
+    padding: 0;
+    font-size: 0.85rem;
+  }
+
+  .tags li {
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,33 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import PostList from '../../../../components/PostList.astro';
+import Pagination from '../../../../components/Pagination.astro';
+import { getPublishedPosts, paginateItems } from '../../../../lib/posts';
+import { categories, categoryPath, type CategoryName } from '../../../../data/categories';
+
+// 1 ページ目は /categories/{category}/ が担当するので、ここでは 2 ページ目以降だけ。
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = await getPublishedPosts();
+
+  return (Object.keys(categories) as CategoryName[]).flatMap((name) => {
+    const filtered = posts.filter((p) => p.data.category === name);
+
+    return paginateItems(filtered)
+      .filter((p) => p.page > 1)
+      .map((p) => ({
+        params: { category: categories[name].slug, page: String(p.page) },
+        props: { name, ...p },
+      }));
+  });
+};
+
+const { name, page, totalPages, items } = Astro.props;
+---
+
+<BaseLayout title={`${name} (${page}ページ目)`} description={categories[name].description} noindex>
+  <h1>{name}</h1>
+
+  <PostList posts={items} />
+  <Pagination base={categoryPath(name)} page={page} totalPages={totalPages} />
+</BaseLayout>

@@ -1,0 +1,40 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostList from '../../../components/PostList.astro';
+import Pagination from '../../../components/Pagination.astro';
+import { getPublishedPosts, paginateItems } from '../../../lib/posts';
+import { categories, categoryPath, type CategoryName } from '../../../data/categories';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = await getPublishedPosts();
+
+  return (Object.keys(categories) as CategoryName[]).map((name) => {
+    const filtered = posts.filter((p) => p.data.category === name);
+    const pages = paginateItems(filtered);
+
+    return {
+      params: { category: categories[name].slug },
+      props: { name, items: pages[0].items, totalPages: pages[0].totalPages },
+    };
+  });
+};
+
+const { name, items, totalPages } = Astro.props;
+const meta = categories[name];
+---
+
+<BaseLayout title={name} description={meta.description}>
+  <h1>{name}</h1>
+  <p class="desc">{meta.description}</p>
+
+  <PostList posts={items} />
+  <Pagination base={categoryPath(name)} page={1} totalPages={totalPages} />
+</BaseLayout>
+
+<style>
+  .desc {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+</style>
