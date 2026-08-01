@@ -81,8 +81,8 @@ Content Collections の zod スキーマが見られない範囲を担当する�
 記事が別リポジトリにあるため、clone しただけでは表示できない。
 
 ```bash
-git clone <このリポジトリ> blog.kazuki.page
-git clone <blog-content>   blog-content    # 同じ階層に置く
+git clone https://github.com/kazuki-page/blog.kazuki.page.git
+git clone https://github.com/kazuki-page/blog-content.git   # 同じ階層に置く
 cd blog.kazuki.page
 npm install
 npm run link:content
