@@ -16,8 +16,10 @@
 # /blog/ と /diary/ はカテゴリの一覧ページだった
 /blog/                /categories/blog/   301
 /diary/               /categories/diary/  301
-# 中身は kazuki.page の問い合わせ先へのリンクだけだった
-/contact/             https://kazuki.page/contact/  301
+# 中身は kazuki.page の問い合わせページへのリンクだけだったが、
+# その kazuki.page/contact が現在 404 のため、暫定でトップに向けている。
+# 問い合わせページを用意したらそちらへ変更すること
+/contact/             https://kazuki.page/  301
 
 # --- slug を変更した記事 -------------------------------------------------
 # 日本語などを含む 5 件は _redirects では非 ASCII のパスに一致しないため、
