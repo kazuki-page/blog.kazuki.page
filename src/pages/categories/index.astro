@@ -21,7 +21,7 @@ const entries = (Object.keys(categories) as CategoryName[]).map((name) => ({
         <li>
           <a href={categoryPath(category.name)}>{category.name}</a>
           <span class="count">{category.count}</span>
-          <p class="desc">{category.description}</p>
+          {category.description && <p class="desc">{category.description}</p>}
         </li>
       ))
     }

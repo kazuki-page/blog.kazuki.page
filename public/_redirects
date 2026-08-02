@@ -1,22 +1,48 @@
-# WordPress が自動生成していた URL からのリダイレクト。
-# 記事本体の URL は変更していないため、ここに書くのは周辺 URL のみ。
+# WordPress からの移行にともなうリダイレクト。
 #
 # 書式: <元パス> <転送先> <ステータス>
-# 上にあるルールから順に評価される。
+# 上から順に評価され、最初に一致したものが使われる。
+# ワイルドカードより先に個別ルールを書くこと。
 
-# RSS — 購読者が失われるため必須
+# --- 旧カテゴリ ---------------------------------------------------------
+# weekly / monthly / yearly はカテゴリからタグへ移した（カテゴリは blog と diary の 2 つに集約）
+/category/weekly/     /tags/weekly/       301
+/category/monthly/    /tags/monthly/      301
+/category/yearly/     /tags/yearly/       301
+/category/*           /categories/:splat  301
+/tag/*                /tags/:splat        301
+
+# --- 固定ページ ---------------------------------------------------------
+# /blog/ と /diary/ はカテゴリの一覧ページだった
+/blog/                /categories/blog/   301
+/diary/               /categories/diary/  301
+# 中身は kazuki.page の問い合わせ先へのリンクだけだった
+/contact/             https://kazuki.page/contact/  301
+
+# --- slug を変更した記事 -------------------------------------------------
+# 英小文字・数字・ハイフン以外を含んでいた 5 件。
+# 16 進表記の大小どちらで来ても拾えるよう両方書いている
+/%EF%BD%8Dake-blog/   /make-blog/         301
+/%ef%bd%8dake-blog/   /make-blog/         301
+/%E3%80%8Cmemo%E3%80%8D%E3%81%AE%E3%80%8Cblog%E3%80%8D%E3%81%B8%E3%81%AE%E7%A7%BB%E8%A1%8C/  /from-memo-to-blog/  301
+/%e3%80%8cmemo%e3%80%8d%e3%81%ae%e3%80%8cblog%e3%80%8d%e3%81%b8%e3%81%ae%e7%a7%bb%e8%a1%8c/  /from-memo-to-blog/  301
+/weekly-2024-01-29%E3%80%9C02-04%EF%BC%9A%E6%97%85%E8%A1%8C/  /weekly-2024-02-04/  301
+/weekly-2024-01-29%e3%80%9c02-04%ef%bc%9a%e6%97%85%e8%a1%8c/  /weekly-2024-02-04/  301
+/%E3%81%AA%E3%81%AB%E3%81%8B/   /something/  301
+/%e3%81%aa%e3%81%ab%e3%81%8b/   /something/  301
+/weekly-2025-09-07%E3%81%9D%E3%81%93%E3%81%9D%E3%81%93%E3%81%AB/  /weekly-2025-09-07/  301
+/weekly-2025-09-07%e3%81%9d%e3%81%93%e3%81%9d%e3%81%93%e3%81%ab/  /weekly-2025-09-07/  301
+
+# --- フィード -----------------------------------------------------------
+# 購読者が失われるため必須
 /feed/                /rss.xml            301
 /feed                 /rss.xml            301
 /feed/atom/           /rss.xml            301
 
-# カテゴリ・タグ（WordPress は単数形、こちらは複数形）
-/category/*           /categories/:splat  301
-/tag/*                /tags/:splat        301
-
-# サイトマップ（SEO プラグインの命名から Astro の命名へ）
+# --- サイトマップ -------------------------------------------------------
 /sitemap_index.xml    /sitemap-index.xml  301
 
-# 以下は意図的にリダイレクトしていない（すべて 404 のままでよい）:
+# 以下は意図的にリダイレクトしていない（404 のままでよい）:
 #   /2024/05/     日付アーカイブ。サイト内のどこからもリンクしていない
 #   /author/xxx/  もともと 404
 #   /?p=123       該当 URL が存在しないことを確認済み

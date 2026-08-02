@@ -24,9 +24,9 @@ const { name, items, totalPages } = Astro.props;
 const meta = categories[name];
 ---
 
-<BaseLayout title={name} description={meta.description}>
+<BaseLayout title={name} description={meta.description ?? `${name} の記事一覧。`}>
   <h1>{name}</h1>
-  <p class="desc">{meta.description}</p>
+  {meta.description && <p class="desc">{meta.description}</p>}
 
   <PostList posts={items} />
   <Pagination base={categoryPath(name)} page={1} totalPages={totalPages} />

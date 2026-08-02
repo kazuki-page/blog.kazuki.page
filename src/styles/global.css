@@ -161,16 +161,31 @@ blockquote {
   color: var(--muted);
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  display: block;
+/*
+ * WordPress から引き継いだ表は列数が多く、本文幅に収まらない。
+ * 表自身を内容ぶんの幅まで広げ、はみ出した分は figure 側で横スクロールさせる。
+ * （表を縮めると 1 文字ずつ折り返されて読めなくなる）
+ */
+figure.wp-block-table {
+  margin-inline: 0;
   overflow-x: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
 }
 
 th,
 td {
   border: 1px solid var(--border);
-  padding: 0.5rem 0.75rem;
+  padding: 0.4rem 0.7rem;
   text-align: start;
+  vertical-align: top;
+}
+
+th {
+  background: var(--code-bg);
+  font-weight: 600;
 }

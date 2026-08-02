@@ -24,7 +24,7 @@ const entries = (Object.keys(tags) as TagName[])
         <li>
           <a href={tagPath(tag.name)}>#{tag.name}</a>
           <span class="count">{tag.count}</span>
-          <p class="desc">{tag.description}</p>
+          {tag.description && <p class="desc">{tag.description}</p>}
         </li>
       ))
     }
