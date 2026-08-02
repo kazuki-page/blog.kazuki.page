@@ -1,10 +1,27 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { categoryPath } from '../data/categories';
 ---
 
 <BaseLayout title="About" description="blog.kazuki.page について。">
   <h1>About</h1>
 
-  <!-- TODO: このブログについての本文を入れる -->
-  <p>準備中。</p>
+  <h2>このブログについて</h2>
+
+  <p>未来の自分に向けた記録として書いています。</p>
+
+  <p>
+    <a href={categoryPath('blog')}>blog</a> は特定のテーマについての記述類、
+    <a href={categoryPath('diary')}>diary</a> は定期的な振り返りです。
+  </p>
+
+  <h2>書いている人について</h2>
+
+  <p>ハンドルネーム：kazuki.page</p>
+
+  <p>
+    詳しいプロフィールは <a href="https://kazuki.page/about/" rel="noopener noreferrer"
+      >kazuki.page/about</a
+    > に置いています。
+  </p>
 </BaseLayout>
