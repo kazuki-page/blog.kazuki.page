@@ -20,25 +20,11 @@
 /contact/             https://kazuki.page/contact/  301
 
 # --- slug を変更した記事 -------------------------------------------------
-# 英小文字・数字・ハイフン以外を含んでいた 5 件。
-# Cloudflare がデコード後のパスで照合するため、生の文字列を先に書く。
-# パーセントエンコード形式も念のため残す（16 進の大小どちらでも拾えるように）
-/ｍake-blog/                       /make-blog/         301
-/「memo」の「blog」への移行/            /from-memo-to-blog/ 301
-/weekly-2024-01-29〜02-04：旅行/    /weekly-2024-02-04/ 301
-/なにか/                           /something/         301
-/weekly-2025-09-07そこそこに/        /weekly-2025-09-07/ 301
+# 日本語などを含む 5 件は _redirects では扱えないため
+# functions/_middleware.js で処理している。
 
-/%EF%BD%8Dake-blog/   /make-blog/         301
-/%ef%bd%8dake-blog/   /make-blog/         301
-/%E3%80%8Cmemo%E3%80%8D%E3%81%AE%E3%80%8Cblog%E3%80%8D%E3%81%B8%E3%81%AE%E7%A7%BB%E8%A1%8C/  /from-memo-to-blog/  301
-/%e3%80%8cmemo%e3%80%8d%e3%81%ae%e3%80%8cblog%e3%80%8d%e3%81%b8%e3%81%ae%e7%a7%bb%e8%a1%8c/  /from-memo-to-blog/  301
-/weekly-2024-01-29%E3%80%9C02-04%EF%BC%9A%E6%97%85%E8%A1%8C/  /weekly-2024-02-04/  301
-/weekly-2024-01-29%e3%80%9c02-04%ef%bc%9a%e6%97%85%e8%a1%8c/  /weekly-2024-02-04/  301
-/%E3%81%AA%E3%81%AB%E3%81%8B/   /something/  301
-/%e3%81%aa%e3%81%ab%e3%81%8b/   /something/  301
-/weekly-2025-09-07%E3%81%9D%E3%81%93%E3%81%9D%E3%81%93%E3%81%AB/  /weekly-2025-09-07/  301
-/weekly-2025-09-07%e3%81%9d%e3%81%93%e3%81%9d%e3%81%93%e3%81%ab/  /weekly-2025-09-07/  301
+# デプロイが届いているかを確認するためのカナリア
+/__canary/            /                   301
 
 # --- フィード -----------------------------------------------------------
 # 購読者が失われるため必須
