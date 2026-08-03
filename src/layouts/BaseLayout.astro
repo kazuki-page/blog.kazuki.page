@@ -13,6 +13,14 @@ interface Props {
 
 const SITE_NAME = 'blog.kazuki.page';
 const DEFAULT_DESCRIPTION = '未来の自分に向けたログ。';
+const GA_MEASUREMENT_ID = 'G-LWFDWQB1V1';
+
+// 式の中に書いた <script> は中身が JSX として解釈されてしまうため、
+// スクリプト本体は文字列として組み立てて set:html で出力する
+const gaSnippet = `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_MEASUREMENT_ID}');`;
 
 const {
   title,
@@ -60,6 +68,20 @@ const copyrightYears =
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href="/rss.xml" />
+
+    {/* Google アナリティクス。開発中に計測してしまわないよう本番ビルドだけ読み込む */}
+    {
+      import.meta.env.PROD && (
+        <Fragment>
+          <script
+            is:inline
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          />
+          <script is:inline set:html={gaSnippet} />
+        </Fragment>
+      )
+    }
   </head>
 
   <body>
