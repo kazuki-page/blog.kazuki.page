@@ -26,6 +26,8 @@ const ENDPOINT = 'https://api.x.com/2/tweets';
 const MAX_LENGTH = 280;
 /** X は URL を t.co の固定長として数える */
 const URL_WEIGHT = 23;
+/** タイトルの前に置く一文 */
+const INTRO = 'ブログで記事を公開しました';
 
 /**
  * 1 回の実行で投稿する上限。
@@ -93,10 +95,49 @@ function readFrontmatter(source) {
   return data;
 }
 
+/**
+ * X の文字数の数え方に合わせた長さ。
+ * 半角英数などは 1、日本語を含むそれ以外は 2 として数えるため、
+ * 素の .length で計算すると日本語のタイトルで上限を超える。
+ */
+function weightedLength(text) {
+  let total = 0;
+  for (const ch of text) {
+    const code = ch.codePointAt(0);
+    const light =
+      code <= 0x10ff ||
+      (code >= 0x2000 && code <= 0x200d) ||
+      (code >= 0x2010 && code <= 0x201f) ||
+      (code >= 0x2032 && code <= 0x2037);
+    total += light ? 1 : 2;
+  }
+  return total;
+}
+
+const ELLIPSIS = '…';
+
+/** 重み付きの長さが limit に収まるよう、末尾を落として … を付ける */
+function truncate(text, limit) {
+  if (weightedLength(text) <= limit) return text;
+
+  // … 自身も 2 文字ぶんとして数えられるので、その分を空けておく
+  const room = limit - weightedLength(ELLIPSIS);
+
+  let out = '';
+  let used = 0;
+  for (const ch of text) {
+    const next = used + weightedLength(ch);
+    if (next > room) break;
+    out += ch;
+    used = next;
+  }
+  return out + ELLIPSIS;
+}
+
 function buildText(title, url) {
-  const budget = MAX_LENGTH - URL_WEIGHT - 2; // 2 = 改行 2 つ
-  const headline = title.length > budget ? title.slice(0, budget - 1) + '…' : title;
-  return `${headline}\n\n${url}`;
+  // 改行 4 つ（INTRO と タイトル、タイトルと URL の間に 2 つずつ）
+  const budget = MAX_LENGTH - URL_WEIGHT - weightedLength(INTRO) - 4;
+  return `${INTRO}\n\n${truncate(title, budget)}\n\n${url}`;
 }
 
 async function post(text) {
