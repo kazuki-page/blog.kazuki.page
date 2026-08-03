@@ -1,33 +1,37 @@
 /**
- * 新しく追加された記事を X に投稿する。
+ * まだ投稿していない記事を X に投稿する。
  *
- * デプロイの直後に GitHub Actions から呼ばれる。投稿対象のファイルは
- * 引数で受け取る（どれが新規かの判定はワークフロー側の git diff が担当）。
+ *   node post-to-x.mjs <記事ディレクトリ> <投稿済みリスト.json>
  *
- *   node post-to-x.mjs <記事ファイル>...
+ * 「どれを投稿済みか」を JSON に記録し、そこに無い記事だけを投稿する。
+ * git の差分で新規判定すると、ビルドが 1 度失敗しただけで
+ * 「新規追加」の履歴が過去のコミットに埋もれ、直して push しても
+ * 二度と投稿されなくなる。記録を持てば再実行でも取りこぼさない。
  *
- * 認証は OAuth 1.0a。X API v2 の POST /2/tweets はアプリ単体ではなく
- * ユーザー権限を要求するため、開発者ポータルで自分用に発行した
- * アクセストークンをそのまま使う（更新不要）。
+ * 認証は OAuth 1.0a。X API v2 の POST /2/tweets はユーザー権限を要求するため、
+ * 開発者ポータルで自分用に発行したアクセストークンをそのまま使う（更新不要）。
  *
  * 必要な環境変数:
  *   X_API_KEY / X_API_SECRET               アプリの Consumer Key / Secret
  *   X_ACCESS_TOKEN / X_ACCESS_TOKEN_SECRET 自分のアカウントのアクセストークン
- *   DRY_RUN=1                              投稿せず内容だけ出力する
- *
- * 認証情報が無いときは何もせず正常終了する。設定前でもデプロイを
- * 失敗させないため。
+ *   DRY_RUN=1                              投稿せず内容だけ出力する（記録も更新しない）
  */
 
 import { createHmac, randomBytes } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
-import { basename } from 'node:path';
+import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { basename, join } from 'node:path';
 
 const SITE = 'https://blog.kazuki.page';
 const ENDPOINT = 'https://api.x.com/2/tweets';
 const MAX_LENGTH = 280;
 /** X は URL を t.co の固定長として数える */
 const URL_WEIGHT = 23;
+
+/**
+ * 1 回の実行で投稿する上限。
+ * 記録ファイルを失った場合に全記事を投稿してしまう事故を防ぐための安全弁。
+ */
+const MAX_BATCH = 5;
 
 const credentials = {
   key: process.env.X_API_KEY,
@@ -111,35 +115,71 @@ async function post(text) {
   return res.json();
 }
 
+async function readState(path) {
+  try {
+    const parsed = JSON.parse(await readFile(path, 'utf8'));
+    if (!Array.isArray(parsed)) throw new Error('配列ではありません');
+    return new Set(parsed);
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      console.error(`✗ 投稿済みリストが見つかりません: ${path}`);
+      console.error('  空の状態で実行すると全記事を投稿してしまうため中止します。');
+      console.error('  既存記事の slug を並べた JSON 配列を作成してください。');
+      process.exit(1);
+    }
+    throw err;
+  }
+}
+
 async function main() {
-  const files = process.argv.slice(2).filter((f) => f.endsWith('.md'));
-  if (files.length === 0) {
-    console.log('新規記事はありません。');
+  const [postsDir, statePath] = process.argv.slice(2);
+  if (!postsDir || !statePath) {
+    console.error('usage: node post-to-x.mjs <記事ディレクトリ> <投稿済みリスト.json>');
+    process.exit(1);
+  }
+
+  const posted = await readState(statePath);
+  const files = (await readdir(postsDir)).filter((f) => f.endsWith('.md')).sort();
+
+  const pending = [];
+  for (const file of files) {
+    const source = await readFile(join(postsDir, file), 'utf8');
+    const data = readFrontmatter(source);
+    const slug = data.slug || basename(file, '.md');
+
+    if (posted.has(slug)) continue;
+    if (data.draft === 'true') {
+      console.log(`スキップ（下書き）: ${file}`);
+      continue;
+    }
+    if (!data.title) {
+      console.log(`スキップ（title なし）: ${file}`);
+      continue;
+    }
+    pending.push({ slug, title: data.title });
+  }
+
+  if (pending.length === 0) {
+    console.log('投稿対象の新しい記事はありません。');
     return;
+  }
+
+  if (pending.length > MAX_BATCH) {
+    console.error(`✗ 投稿対象が ${pending.length} 件あります（上限 ${MAX_BATCH} 件）。`);
+    console.error('  投稿済みリストが失われている可能性があります。中身を確認してください。');
+    console.error('  対象:', pending.map((p) => p.slug).join(', '));
+    process.exit(1);
   }
 
   const configured = Object.values(credentials).every(Boolean);
   if (!configured && !dryRun) {
     console.log('X の認証情報が未設定のため投稿をスキップします。');
-    console.log('対象だった記事:', files.map((f) => basename(f)).join(', '));
+    console.log('対象だった記事:', pending.map((p) => p.slug).join(', '));
     return;
   }
 
-  for (const file of files) {
-    const source = await readFile(file, 'utf8');
-    const data = readFrontmatter(source);
-
-    if (data.draft === 'true') {
-      console.log(`スキップ（下書き）: ${basename(file)}`);
-      continue;
-    }
-    if (!data.title) {
-      console.log(`スキップ（title なし）: ${basename(file)}`);
-      continue;
-    }
-
-    const slug = data.slug || basename(file, '.md');
-    const text = buildText(data.title, `${SITE}/${slug}/`);
+  for (const { slug, title } of pending) {
+    const text = buildText(title, `${SITE}/${slug}/`);
 
     if (dryRun) {
       console.log(`--- 投稿内容（DRY_RUN のため送信しません）\n${text}\n`);
@@ -147,8 +187,17 @@ async function main() {
     }
 
     const result = await post(text);
-    console.log(`投稿しました: ${data.title} → ${result?.data?.id ?? '(id 不明)'}`);
+    console.log(`投稿しました: ${title} → ${result?.data?.id ?? '(id 不明)'}`);
+    posted.add(slug);
   }
+
+  if (dryRun) {
+    console.log('DRY_RUN のため投稿済みリストは更新しません。');
+    return;
+  }
+
+  await writeFile(statePath, JSON.stringify([...posted].sort(), null, 2) + '\n');
+  console.log(`投稿済みリストを更新しました（${posted.size} 件）。`);
 }
 
 await main();
