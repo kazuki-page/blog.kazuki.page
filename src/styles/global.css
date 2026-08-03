@@ -30,15 +30,20 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
-header,
+/*
+ * サイト全体のヘッダー・フッターは body の直下にあるものだけ。
+ * 子孫セレクタにすると記事内の <header> や <footer> にも当たってしまう
+ * （記事ヘッダーが横並びになる、ポリシーの日付欄が横に散らばる等）。
+ */
+body > header,
 main,
-footer {
+body > footer {
   max-width: var(--measure);
   margin: 0 auto;
   padding-inline: 1.5rem;
 }
 
-header {
+body > header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -48,7 +53,7 @@ header {
   font-size: 0.9rem;
 }
 
-header nav {
+body > header nav {
   display: flex;
   gap: 1rem;
 }
@@ -57,7 +62,7 @@ main {
   padding-block: 2rem 4rem;
 }
 
-footer {
+body > footer {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -69,7 +74,7 @@ footer {
   font-size: 0.85rem;
 }
 
-footer p {
+body > footer p {
   margin: 0;
 }
 
