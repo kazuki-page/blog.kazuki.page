@@ -51,6 +51,15 @@ const { posts } = Astro.props;
     font-variant-numeric: tabular-nums;
   }
 
+  /* 一覧が青一色にならないよう、タイトルはホバーしたときだけリンク色にする */
+  .post-title {
+    color: var(--text);
+  }
+
+  .post-title:hover {
+    color: var(--accent);
+  }
+
   .post-category {
     color: var(--muted);
     font-size: 0.8rem;
