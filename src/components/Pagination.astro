@@ -16,7 +16,7 @@ const { base, page, totalPages } = Astro.props;
     <nav class="pagination" aria-label="ページ送り">
       {page > 1 ? (
         <a href={pageUrl(base, page - 1)} rel="prev">
-          ← 新しい
+          ← Newer
         </a>
       ) : (
         <span />
@@ -28,7 +28,7 @@ const { base, page, totalPages } = Astro.props;
 
       {page < totalPages ? (
         <a href={pageUrl(base, page + 1)} rel="next">
-          古い →
+          Older →
         </a>
       ) : (
         <span />
