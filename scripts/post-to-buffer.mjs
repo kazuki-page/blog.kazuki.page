@@ -15,7 +15,8 @@
  *
  * 必要な環境変数:
  *   BUFFER_ACCESS_TOKEN  publish.buffer.com/settings/api で発行する API キー
- *   BUFFER_CHANNEL_ID    投稿先チャンネル（--channels で確認できる）
+ *   BUFFER_CHANNEL_ID    投稿先チャンネル。カンマ区切りで複数指定できる
+ *                        （例: X と Bluesky に同時投稿する。--channels で確認）
  *   DRY_RUN=1            送信せず内容だけ出力する（記録も更新しない）
  */
 
@@ -39,7 +40,11 @@ const ELLIPSIS = '…';
 const MAX_BATCH = 5;
 
 const token = process.env.BUFFER_ACCESS_TOKEN;
-const channelId = process.env.BUFFER_CHANNEL_ID;
+/** カンマ区切りで複数指定できる（X と Bluesky に同時投稿するなど） */
+const channelIds = (process.env.BUFFER_CHANNEL_ID ?? '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
 const dryRun = process.env.DRY_RUN === '1';
 
 async function graphql(query, description) {
@@ -143,7 +148,7 @@ async function listChannels() {
   }
 }
 
-async function createPost(text) {
+async function createPost(text, channelId) {
   const mutation = `
     mutation {
       createPost(input: {
@@ -232,23 +237,37 @@ async function main() {
     process.exit(1);
   }
 
-  if ((!token || !channelId) && !dryRun) {
+  if ((!token || channelIds.length === 0) && !dryRun) {
     console.log('Buffer の設定が未完了のため投稿をスキップします。');
     console.log('対象だった記事:', pending.map((p) => p.slug).join(', '));
     return;
   }
 
+  const failures = [];
+
   for (const { slug, title } of pending) {
     const text = buildText(title, `${SITE}/${slug}/`);
 
     if (dryRun) {
-      console.log(`--- 投稿内容（DRY_RUN のため送信しません）\n${text}\n`);
+      console.log(`--- 投稿内容（DRY_RUN のため送信しません / ${channelIds.length} チャンネル）`);
+      console.log(`${text}\n`);
       continue;
     }
 
-    const post = await createPost(text);
-    console.log(`Buffer 経由で投稿: ${title} → ${post?.id ?? '(id 不明)'}`);
-    posted.add(slug);
+    // 1 つでも成功したら投稿済みとして記録する。
+    // 記録しないと、次の実行で成功済みのチャンネルに二重投稿してしまう
+    let anySucceeded = false;
+    for (const channelId of channelIds) {
+      try {
+        const post = await createPost(text, channelId);
+        console.log(`投稿: ${title} → channel ${channelId} / post ${post?.id ?? '(id 不明)'}`);
+        anySucceeded = true;
+      } catch (err) {
+        console.error(`✗ channel ${channelId} への投稿に失敗: ${err.message}`);
+        failures.push(`${slug} → ${channelId}`);
+      }
+    }
+    if (anySucceeded) posted.add(slug);
   }
 
   if (dryRun) {
@@ -258,6 +277,13 @@ async function main() {
 
   await writeFile(statePath, JSON.stringify([...posted].sort(), null, 2) + '\n');
   console.log(`投稿済みリストを更新しました（${posted.size} 件）。`);
+
+  if (failures.length > 0) {
+    console.error(`\n✗ ${failures.length} 件の投稿に失敗しました:`);
+    for (const f of failures) console.error(`  ${f}`);
+    console.error('成功したぶんは記録済みなので、再実行しても二重投稿にはなりません。');
+    process.exit(1);
+  }
 }
 
 await main();
