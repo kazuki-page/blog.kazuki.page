@@ -1,5 +1,5 @@
 /**
- * まだ投稿していない記事を Buffer のキューに積む。
+ * まだ投稿していない記事を Buffer 経由で即時投稿する。
  *
  *   node post-to-buffer.mjs <記事ディレクトリ> <投稿済みリスト.json>
  *   node post-to-buffer.mjs --channels          # 接続先の一覧を表示（初期設定用）
@@ -150,7 +150,7 @@ async function createPost(text) {
         text: ${quote(text)},
         channelId: ${quote(channelId)},
         schedulingType: automatic,
-        mode: addToQueue
+        mode: shareNow
       }) {
         ... on PostActionSuccess { post { id dueAt } }
         ... on MutationError { message }
@@ -247,7 +247,7 @@ async function main() {
     }
 
     const post = await createPost(text);
-    console.log(`Buffer のキューに追加: ${title} → ${post?.id ?? '(id 不明)'}`);
+    console.log(`Buffer 経由で投稿: ${title} → ${post?.id ?? '(id 不明)'}`);
     posted.add(slug);
   }
 
