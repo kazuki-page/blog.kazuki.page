@@ -62,6 +62,12 @@ body > header {
 .site-logo svg {
   height: 20px;
   width: auto;
+  /*
+   * 塗りのパスは fill 属性を持たず、SVG の初期値（黒）で描かれている。
+   * ここで currentColor を指定すると文字色に追従する。
+   * fill="none" を明示している線画のパスは影響を受けない。
+   */
+  fill: currentColor;
 }
 
 body > header nav {
