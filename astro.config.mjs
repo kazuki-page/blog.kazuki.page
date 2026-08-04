@@ -15,7 +15,12 @@ export default defineConfig({
   // 「静か・装飾しない」方針に合わせて、コードブロックも明るい配色に揃える
   markdown: {
     shikiConfig: {
-      theme: 'github-light',
+      // 両方の配色を CSS 変数として埋め込み、global.css の
+      // [data-theme='dark'] 側で切り替える
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark',
+      },
       wrap: false,
     },
   },

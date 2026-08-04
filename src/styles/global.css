@@ -10,7 +10,40 @@
   --accent: #0066cc;
   --border: #e5e5e5;
   --code-bg: #f5f5f5;
+  --draft: #cc0000;
   --measure: 42rem;
+}
+
+/*
+ * ダークテーマ。
+ * <head> の同期スクリプトが描画前に data-theme を付けるので、
+ * 通常はこちらの指定だけで切り替わる。
+ */
+:root[data-theme='dark'] {
+  --bg: #141414;
+  --text: #e6e6e6;
+  --muted: #9a9a9a;
+  /* 黒背景では #0066cc は暗すぎて読めないため明るい青にする */
+  --accent: #7ab3f5;
+  --border: #2e2e2e;
+  --code-bg: #1e1e1e;
+  --draft: #ff8080;
+}
+
+/*
+ * JavaScript が無効で data-theme が付かない場合のフォールバック。
+ * 上と同じ値を持つが、セレクタが違うためまとめられない。
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #141414;
+    --text: #e6e6e6;
+    --muted: #9a9a9a;
+    --accent: #7ab3f5;
+    --border: #2e2e2e;
+    --code-bg: #1e1e1e;
+    --draft: #ff8080;
+  }
 }
 
 *,
@@ -186,6 +219,22 @@ pre code {
 /* Shiki が pre にインラインで背景色を書き込むため、!important で地色に揃える */
 pre.astro-code {
   background-color: var(--code-bg) !important;
+}
+
+/*
+ * Shiki は 2 テーマ指定で --shiki-dark を各要素に埋め込む。
+ * 背景は上で地色に揃えているので、ここでは文字色だけ差し替える。
+ */
+:root[data-theme='dark'] .astro-code,
+:root[data-theme='dark'] .astro-code span {
+  color: var(--shiki-dark) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .astro-code,
+  :root:not([data-theme]) .astro-code span {
+    color: var(--shiki-dark) !important;
+  }
 }
 
 blockquote {

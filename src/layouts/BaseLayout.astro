@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Logo from '../assets/logo.svg';
+import HeaderControls from '../components/HeaderControls.astro';
 
 interface Props {
   title?: string;
@@ -49,6 +50,24 @@ const copyrightYears =
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {/*
+      テーマは描画前に確定させる。CSS 読み込み後に JS で切り替えると、
+      ダークを選んでいる人の再訪時に一瞬白い画面が出る。
+      そのため同期実行のインラインスクリプトをここに置いている。
+    */}
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          document.documentElement.dataset.theme =
+            stored ||
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        } catch (e) {
+          /* localStorage が使えない環境では OS の設定にまかせる */
+        }
+      })();
+    </script>
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -94,7 +113,7 @@ const copyrightYears =
         <a href="/categories/">Categories</a>
         <a href="/tags/">Tags</a>
         <a href="/about/">About</a>
-        <a href="/rss.xml">RSS</a>
+        <HeaderControls />
       </nav>
     </header>
 
