@@ -1,0 +1,91 @@
+---
+/**
+ * パンくずリスト。本文の下、フッターの手前に置く。
+ *
+ * このサイトの URL はフラット（記事は /{slug}/）なので、
+ * URL の階層ではなくカテゴリを論理的な親として並べる。
+ * 構造化データも同時に出力して、検索結果にも反映されるようにする。
+ *
+ * Home は常に先頭に付くので、呼び出し側はそれ以降だけ渡す。
+ */
+
+export interface Crumb {
+  label: string;
+  /** 省略すると現在地扱いになり、リンクにならない */
+  href?: string;
+}
+
+interface Props {
+  items: Crumb[];
+}
+
+const { items } = Astro.props;
+const crumbs: Crumb[] = [{ label: 'Home', href: '/' }, ...items];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((crumb, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: crumb.label,
+    ...(crumb.href ? { item: new URL(crumb.href, Astro.site).toString() } : {}),
+  })),
+};
+---
+
+<nav class="breadcrumb" aria-label="現在の位置">
+  <ol>
+    {
+      crumbs.map((crumb, i) => (
+        <li>
+          {crumb.href && i < crumbs.length - 1 ? (
+            <a href={crumb.href}>{crumb.label}</a>
+          ) : (
+            <span aria-current="page">{crumb.label}</span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+
+<style>
+  .breadcrumb {
+    margin-top: 4rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    margin: 0;
+    /* 長い記事タイトルでも折り返せるよう、幅の上限は設けない */
+    min-width: 0;
+  }
+
+  /* 区切りは装飾なので読み上げには乗せない */
+  li + li::before {
+    content: '/';
+    margin-right: 0.5rem;
+    color: var(--border);
+  }
+
+  a {
+    color: inherit;
+  }
+
+  a:hover {
+    color: var(--accent);
+  }
+</style>

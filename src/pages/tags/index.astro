@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import { getPublishedPosts } from '../../lib/posts';
 import { tags, tagPath, type TagName } from '../../data/tags';
 
@@ -29,6 +30,7 @@ const entries = (Object.keys(tags) as TagName[])
       ))
     }
   </ul>
+  <Breadcrumb items={[{ label: 'Tags' }]} />
 </BaseLayout>
 
 <style>

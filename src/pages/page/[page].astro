@@ -1,6 +1,7 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import PostList from '../../components/PostList.astro';
 import Pagination from '../../components/Pagination.astro';
 import { getPublishedPosts, paginateItems } from '../../lib/posts';
@@ -23,4 +24,5 @@ const { page, totalPages, items } = Astro.props;
 <BaseLayout title={`${page}ページ目`} noindex>
   <PostList posts={items} />
   <Pagination base="/" page={page} totalPages={totalPages} />
+  <Breadcrumb items={[{ label: `${page}ページ目` }]} />
 </BaseLayout>

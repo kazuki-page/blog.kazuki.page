@@ -1,6 +1,7 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
 import PostList from '../../../components/PostList.astro';
 import Pagination from '../../../components/Pagination.astro';
 import { getPublishedPosts, paginateItems } from '../../../lib/posts';
@@ -30,6 +31,7 @@ const meta = tags[name];
 
   <PostList posts={items} />
   <Pagination base={tagPath(name)} page={1} totalPages={totalPages} />
+  <Breadcrumb items={[{ label: 'Tags', href: '/tags/' }, { label: `#${name}` }]} />
 </BaseLayout>
 
 <style>

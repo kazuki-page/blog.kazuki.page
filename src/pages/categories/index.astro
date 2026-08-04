@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import { getPublishedPosts } from '../../lib/posts';
 import { categories, categoryPath, type CategoryName } from '../../data/categories';
 
@@ -26,6 +27,7 @@ const entries = (Object.keys(categories) as CategoryName[]).map((name) => ({
       ))
     }
   </ul>
+  <Breadcrumb items={[{ label: 'Categories' }]} />
 </BaseLayout>
 
 <style>

@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
 import { getPublishedPosts, postSlug, formatDate } from '../lib/posts';
 import { categoryPath } from '../data/categories';
 import { tagPath } from '../data/tags';
@@ -52,6 +53,7 @@ const { title, description, date, updated, category, tags, ogImage, draft } = po
 
     <Content />
   </article>
+  <Breadcrumb items={[{ label: category, href: categoryPath(category) }, { label: title }]} />
 </BaseLayout>
 
 <style>

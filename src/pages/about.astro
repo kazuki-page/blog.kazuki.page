@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
 import { categoryPath } from '../data/categories';
 ---
 
@@ -24,4 +25,5 @@ import { categoryPath } from '../data/categories';
       >kazuki.page/about</a
     > に置いています。
   </p>
+  <Breadcrumb items={[{ label: 'About' }]} />
 </BaseLayout>
