@@ -61,6 +61,13 @@ body {
   font-size: 16px;
   line-height: 1.8;
   -webkit-text-size-adjust: 100%;
+  /*
+   * 記事本文には改行なしの長い URL がそのままリンクテキストとして
+   * 出てくることがある（例: github-clone-fatal.md）。折り返さないと
+   * 本文幅を突き破って横スクロールが発生するため、はみ出す語だけ折り返す。
+   * pre は white-space:pre で独自に折り返さないので、ここでは影響しない。
+   */
+  overflow-wrap: break-word;
 }
 
 /*
