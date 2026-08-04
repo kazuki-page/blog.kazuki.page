@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Logo from '../assets/logo.svg';
 
 interface Props {
   title?: string;
@@ -86,7 +87,9 @@ const copyrightYears =
 
   <body>
     <header>
-      <a href="/">{SITE_NAME}</a>
+      <a href="/" class="site-logo" aria-label={SITE_NAME}>
+        <Logo role="img" />
+      </a>
       <nav>
         <a href="/categories/">Categories</a>
         <a href="/tags/">Tags</a>

@@ -46,11 +46,22 @@ body > footer {
 body > header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  /* ロゴは画像なので文字のベースラインを持たない。中央で揃える */
+  align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
   padding-block: 1.5rem;
   font-size: 0.9rem;
+}
+
+/* ロゴは高さだけ決め、幅は viewBox の比率にまかせる */
+.site-logo {
+  display: flex;
+}
+
+.site-logo svg {
+  height: 20px;
+  width: auto;
 }
 
 body > header nav {
