@@ -109,14 +109,28 @@ body > header nav {
 }
 
 /*
- * ヘッダーは常時リンク色にすると主張が強いので、本文と同じ色にしておき
- * ホバーしたときだけ色を変える。記事一覧のタイトルも同じ扱い（PostList 側）。
+ * リンクの色は「本文か、ナビゲーションか」で分ける。
+ *
+ *   本文中のリンク    … 文章に埋もれ、どこがリンクか予測できないので常時青
+ *   ナビゲーション    … 位置と文脈で押せると分かるので、ホバーまで色を付けない
+ *
+ * inherit にしているのは、置かれた場所の色をそのまま使うため。
+ * 記事メタなら補助色のグレー、それ以外なら本文色になる。
+ * 記事一覧のタイトルは PostList 側で同じ扱いにしている。
  */
-body > header a {
-  color: var(--text);
+body > header a,
+body > footer a,
+.post-header a,
+.taxonomy a,
+.pagination a {
+  color: inherit;
 }
 
-body > header a:hover {
+body > header a:hover,
+body > footer a:hover,
+.post-header a:hover,
+.taxonomy a:hover,
+.pagination a:hover {
   color: var(--accent);
 }
 
