@@ -166,11 +166,34 @@ h4 {
 h1 {
   font-size: 1.6rem;
 }
+
+/*
+ * 見出しの下線・左ボーダーは本文幅いっぱいではなく少しずつ内側に絞る。
+ * h2 の下線の絞り幅 = h3 のインデント幅（blockquote の左ボーダーと同じ考え方）。
+ * h4 は罫線を付けず、サイズだけで一段下と分かるようにする。
+ */
 h2 {
   font-size: 1.3rem;
+  position: relative;
+  padding-bottom: 0.6rem;
 }
+
+h2::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0.65rem;
+  bottom: 0;
+  border-bottom: 1px solid var(--border);
+}
+
 h3 {
   font-size: 1.1rem;
+  padding-inline-start: 0.65rem;
+  border-inline-start: 2px solid var(--border);
+}
+
+h4 {
+  font-size: 1.05rem;
 }
 
 p {
