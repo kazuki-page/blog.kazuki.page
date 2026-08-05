@@ -38,11 +38,6 @@ const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImageUrl = new URL(ogImage, Astro.site);
 
-// ブログ開始年から現在年まで。同一年なら単年表示。
-const SITE_START_YEAR = 2022;
-const currentYear = new Date().getFullYear();
-const copyrightYears =
-  currentYear > SITE_START_YEAR ? `${SITE_START_YEAR}-${currentYear}` : `${SITE_START_YEAR}`;
 ---
 
 <!doctype html>
@@ -122,7 +117,7 @@ const copyrightYears =
     </main>
 
     <footer>
-      <p>&copy; {copyrightYears} blog.kazuki.page</p>
+      <p>&copy; blog.kazuki.page</p>
       <nav>
         <a href="/policy/">Policy</a>
       </nav>
