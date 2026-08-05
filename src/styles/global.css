@@ -142,6 +142,11 @@ body > header nav {
   gap: 1rem;
 }
 
+body > footer nav {
+  display: flex;
+  gap: 1rem;
+}
+
 /*
  * リンクの色は「本文か、ナビゲーションか」で分ける。
  *
