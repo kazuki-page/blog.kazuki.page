@@ -111,13 +111,12 @@ body > footer {
   padding-inline: 1.5rem;
 }
 
+/* ロゴを1段目、ナビゲーションを2段目に積み、どちらも中央揃えにする */
 body > header {
   display: flex;
-  justify-content: space-between;
-  /* ロゴは画像なので文字のベースラインを持たない。中央で揃える */
+  flex-direction: column;
   align-items: center;
   gap: 1rem;
-  flex-wrap: wrap;
   padding-block: 1.5rem;
   font-size: 0.9rem;
 }
