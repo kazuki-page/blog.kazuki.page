@@ -15,11 +15,11 @@ const { posts } = Astro.props;
     <ul class="post-list">
       {posts.map((post) => (
         <li>
-          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
           <a class="post-title" href={postPath(post)}>
             {post.data.title}
             {post.data.draft && <span class="draft"> [下書き]</span>}
           </a>
+          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
         </li>
       ))}
     </ul>
@@ -35,7 +35,7 @@ const { posts } = Astro.props;
 
   .post-list li {
     display: grid;
-    grid-template-columns: 6.5rem 1fr;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 0.75rem;
     align-items: baseline;
     margin: 0.75rem 0;
@@ -45,6 +45,8 @@ const { posts } = Astro.props;
     color: var(--muted);
     font-size: 0.85rem;
     font-variant-numeric: tabular-nums;
+    justify-self: end;
+    white-space: nowrap;
   }
 
   /* 一覧が青一色にならないよう、タイトルはホバーしたときだけリンク色にする */
@@ -58,13 +60,5 @@ const { posts } = Astro.props;
 
   .draft {
     color: var(--draft);
-  }
-
-  @media (max-width: 30rem) {
-    .post-list li {
-      grid-template-columns: 1fr;
-      gap: 0.15rem;
-      margin: 1.25rem 0;
-    }
   }
 </style>
