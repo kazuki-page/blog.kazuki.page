@@ -12,6 +12,11 @@
   --code-bg: #f5f5f5;
   --draft: #cc0000;
   --measure: 42rem;
+
+  /* ページ最上部の帯用。ライト/ダークで変えない固定の差し色 */
+  --stripe-yellow: #ffb94d;
+  --stripe-navy: #003156;
+  --stripe-lightblue: #e8f1ff;
 }
 
 /*
@@ -61,6 +66,8 @@ body {
   font-size: 16px;
   line-height: 1.8;
   -webkit-text-size-adjust: 100%;
+  /* 最上部の帯 (body::before) をビューポート端に付けず、少し余白を空けて置く */
+  padding-top: 8px;
   /*
    * 記事本文には改行なしの長い URL がそのままリンクテキストとして
    * 出てくることがある（例: github-clone-fatal.md）。折り返さないと
@@ -68,6 +75,27 @@ body {
    * pre は white-space:pre で独自に折り返さないので、ここでは影響しない。
    */
   overflow-wrap: break-word;
+}
+
+/*
+ * ページ最上部に引く3本の細い線（各3px、左右画面端まで）。
+ * 上から水色・黄色・紺色。それぞれ中央が最も濃く、左右の端にいくほど透明になり背景に消える。
+ * 3枚の横グラデーションを、高さ1/3ずつ top/center/bottom に積んで配置する。
+ */
+body::before {
+  content: '';
+  display: block;
+  height: 9px;
+  background-repeat: no-repeat;
+  background-size: 100% 33.334%;
+  background-position:
+    top,
+    center,
+    bottom;
+  background-image:
+    linear-gradient(to right, transparent, var(--stripe-lightblue), transparent),
+    linear-gradient(to right, transparent, var(--stripe-yellow), transparent),
+    linear-gradient(to right, transparent, var(--stripe-navy), transparent);
 }
 
 /*
