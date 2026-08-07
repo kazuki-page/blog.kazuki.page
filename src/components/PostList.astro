@@ -61,4 +61,20 @@ const { posts } = Astro.props;
   .draft {
     color: var(--draft);
   }
+
+  /*
+   * モバイルは横幅が狭く、右端の日付がタイトル(特に2行に折り返す長いもの)の
+   * 右上に浮いて見えるため、タイトルの下に小さく日付を置く2行構成にする。
+   */
+  @media (max-width: 30rem) {
+    .post-list li {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+
+    time {
+      font-size: 0.7rem;
+      justify-self: start;
+    }
+  }
 </style>
