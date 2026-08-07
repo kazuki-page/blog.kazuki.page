@@ -6,10 +6,14 @@
  */
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { getPublishedPosts, postSlug } from '../../lib/posts';
-import { renderOgpImage } from '../../lib/ogp-render';
+import { prepareOgpCache, renderOgpImage } from '../../lib/ogp-render';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const posts = await getPublishedPosts();
+
+  // 1 枚ずつ書き出す GET より前に通る、全記事が揃っている唯一の場所。
+  // ここでキャッシュの要否を判断し、不要になった画像を落とす。
+  prepareOgpCache(posts.map((post) => post.data.title));
 
   return posts.map((post) => ({
     params: { slug: postSlug(post) },

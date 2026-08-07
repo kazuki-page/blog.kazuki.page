@@ -2,6 +2,8 @@
 dist/
 # generated types
 .astro/
+# 生成済みの OGP 画像。増えた記事のぶんだけ作るための置き場（CI では Actions のキャッシュ）
+.ogp-cache/
 
 # dependencies
 node_modules/
