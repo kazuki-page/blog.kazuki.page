@@ -1,0 +1,100 @@
+---
+/**
+ * 同じカテゴリの中で前後の記事へ移動するリンク。本文の下、パンくずの上に置く。
+ *
+ * 「前 = 1 つ古い記事、次 = 1 つ新しい記事」で、左が前・右が次。
+ * 移行前の WordPress と同じ向きに揃えてある。
+ *
+ * カテゴリの端の記事では片側だけになるので、次の記事は grid-column を明示して
+ * 前の記事が無くても右の列に残るようにする。
+ */
+import type { AdjacentLink } from '../lib/posts';
+
+interface Props {
+  category: string;
+  older?: AdjacentLink;
+  newer?: AdjacentLink;
+}
+
+const { category, older, newer } = Astro.props;
+---
+
+{
+  (older || newer) && (
+    <nav class="post-nav" aria-label={`${category} カテゴリの前後の記事`}>
+      {older && (
+        <a class="older" href={older.href}>
+          <span class="label">← 前の記事</span>
+          <span class="title">{older.title}</span>
+        </a>
+      )}
+      {newer && (
+        <a class="newer" href={newer.href}>
+          <span class="label">次の記事 →</span>
+          <span class="title">{newer.title}</span>
+        </a>
+      )}
+    </nav>
+  )
+}
+
+<style>
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+
+  a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    /* 一覧のタイトルと同じ扱い。ホバーしたときだけリンク色にする */
+    color: var(--text);
+  }
+
+  a:hover {
+    color: var(--accent);
+  }
+
+  .newer {
+    grid-column: 2;
+    text-align: end;
+  }
+
+  .label {
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  /*
+   * タイトルは長いものだと 4 行以上になり、本文より目立ってしまう。
+   * 2 行で打ち切って高さを揃える（リンクの文字列自体は削らないので、
+   * 読み上げと検索エンジンには全文が渡る）。
+   */
+  .title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    line-height: 1.6;
+  }
+
+  /* 幅が狭いと 2 列では 1 行あたりの文字数が足りないので、縦に積む */
+  @media (max-width: 30rem) {
+    .post-nav {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    .newer {
+      grid-column: 1;
+      text-align: start;
+    }
+  }
+</style>

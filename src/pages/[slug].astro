@@ -3,20 +3,33 @@ import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
-import { getPublishedPosts, postSlug, formatDate } from '../lib/posts';
+import PostNav from '../components/PostNav.astro';
+import {
+  getPublishedPosts,
+  postSlug,
+  formatDate,
+  adjacentInCategory,
+  toAdjacentLink,
+} from '../lib/posts';
 import { categoryPath } from '../data/categories';
 import { tagPath } from '../data/tags';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const posts = await getPublishedPosts();
+  const adjacent = adjacentInCategory(posts);
 
-  return posts.map((post) => ({
-    params: { slug: postSlug(post) },
-    props: { post },
-  }));
+  return posts.map((post) => {
+    const { newer, older } = adjacent.get(post.id) ?? {};
+
+    return {
+      params: { slug: postSlug(post) },
+      // 前後の記事は必要な項目だけ渡す（Post をまるごと渡すと props が肥大するため）
+      props: { post, newer: toAdjacentLink(newer), older: toAdjacentLink(older) },
+    };
+  });
 };
 
-const { post } = Astro.props;
+const { post, newer, older } = Astro.props;
 const { Content } = await render(post);
 const { title, description, date, updated, category, tags, ogImage, draft } = post.data;
 
@@ -57,6 +70,7 @@ const ogImagePath = ogImage ?? `/og/${postSlug(post)}.png`;
 
     <Content />
   </article>
+  <PostNav category={category} older={older} newer={newer} />
   <Breadcrumb items={[{ label: category, href: categoryPath(category) }, { label: title }]} />
 </BaseLayout>
 
