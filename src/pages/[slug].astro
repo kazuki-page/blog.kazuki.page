@@ -19,12 +19,16 @@ export const getStaticPaths: GetStaticPaths = async () => {
 const { post } = Astro.props;
 const { Content } = await render(post);
 const { title, description, date, updated, category, tags, ogImage, draft } = post.data;
+
+// frontmatter で明示されていなければ、タイトルを載せた画像を自動生成して使う
+// （実体は src/pages/og/[slug].png.ts がビルド時に書き出す）
+const ogImagePath = ogImage ?? `/og/${postSlug(post)}.png`;
 ---
 
 <BaseLayout
   title={title}
   description={description}
-  ogImage={ogImage}
+  ogImage={ogImagePath}
   ogType="article"
   publishedAt={date}
   updatedAt={updated}

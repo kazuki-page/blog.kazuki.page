@@ -53,6 +53,22 @@ export const tags = {
 記事の frontmatter には表示名を書き、URL には slug を使う。
 **マスタに無い名前が現れたらビルドを失敗させる** —— 表記ゆれを検出するため。
 
+## OGP 画像
+
+記事の OGP 画像はビルド時に自動生成する（`/og/{slug}.png`）。
+背景は固定の PNG で、その上にタイトルだけを載せる。
+
+- 配置と折り返しの規則は `src/lib/ogp.ts`、描画は `src/lib/ogp-render.ts`
+- 背景・フォントは `src/assets/ogp/`（BIZ UDGothic、SIL Open Font License 1.1）
+- frontmatter に `ogImage` があればそちらを優先する
+- 記事以外のページは `public/ogp-default.png` を使う
+
+タイトルの折り返しは Satori の自動改行を使わず自前で決めている。禁則処理、
+欧文の単語の分断回避、最終行が短くなりすぎないための調整が必要なため。
+BIZ UDGothic は完全な等幅（ASCII が 0.5em、それ以外が 1em）なので字幅を厳密に計算できる。
+
+3 行に収まらないタイトルはフォントを 1 段階縮めて収める。
+
 ## 検証
 
 `npm run build` の前段で `scripts/validate-content.ts` が走る。
@@ -95,3 +111,4 @@ npm run dev
 - Cloudflare Pages（Direct Upload）
 - GitHub Actions
 - TypeScript / zod
+- [satori](https://github.com/vercel/satori) / [resvg](https://github.com/yisibl/resvg-js)（OGP 画像の生成）
