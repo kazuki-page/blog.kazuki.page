@@ -220,16 +220,17 @@ export function layoutTitle(title: string): TitleLayout {
     fontSize = size;
   }
 
+  const rendered = lines.map((l) => trimSpaces(l).join('')).filter((l) => l.length > 0);
   const lineHeight = fontSize * LINE_HEIGHT_RATIO;
 
-  // 中心に置く行。1 行なら自分自身、2 行以上なら 2 行目
-  const anchorIndex = lines.length === 1 ? 0 : 1;
-  const top = TEXT_AREA_CENTER - (anchorIndex + 0.5) * lineHeight;
+  /*
+   * 行のかたまり全体を、上の長方形の中心に置く。
+   *
+   * 以前は「2 行目を中心の行にする」規則にしていたが、それだと 2 行のときだけ
+   * かたまりの中心が半行ぶん上にずれ、文字が浮いて見えた。
+   * 1 行と 3 行はこの式でも位置が変わらない。
+   */
+  const top = TEXT_AREA_CENTER - (rendered.length / 2) * lineHeight;
 
-  return {
-    lines: lines.map((l) => trimSpaces(l).join('')).filter((l) => l.length > 0),
-    fontSize,
-    top,
-    lineHeight,
-  };
+  return { lines: rendered, fontSize, top, lineHeight };
 }
