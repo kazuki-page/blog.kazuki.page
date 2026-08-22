@@ -18,6 +18,10 @@
  *   BUFFER_CHANNEL_ID    投稿先チャンネル。カンマ区切りで複数指定できる
  *                        （例: X と Bluesky に同時投稿する。--channels で確認）
  *   DRY_RUN=1            送信せず内容だけ出力する（記録も更新しない）
+ *   RECORD_ONLY=1        送信しないが、投稿済みとして記録する。
+ *                        自動投稿を止めている間に使う。止めている間も記録を
+ *                        進めておかないと、再開したときに止めていた期間の記事が
+ *                        まとめて送られてしまう。
  */
 
 import { readdir, readFile, writeFile } from 'node:fs/promises';
@@ -46,6 +50,8 @@ const channelIds = (process.env.BUFFER_CHANNEL_ID ?? '')
   .map((s) => s.trim())
   .filter(Boolean);
 const dryRun = process.env.DRY_RUN === '1';
+/** 送信はしないが記録は進める。自動投稿を止めている間の運転 */
+const recordOnly = process.env.RECORD_ONLY === '1';
 
 async function graphql(query, description) {
   const res = await fetch(ENDPOINT, {
@@ -237,7 +243,7 @@ async function main() {
     process.exit(1);
   }
 
-  if ((!token || channelIds.length === 0) && !dryRun) {
+  if ((!token || channelIds.length === 0) && !dryRun && !recordOnly) {
     console.log('Buffer の設定が未完了のため投稿をスキップします。');
     console.log('対象だった記事:', pending.map((p) => p.slug).join(', '));
     return;
@@ -251,6 +257,12 @@ async function main() {
     if (dryRun) {
       console.log(`--- 投稿内容（DRY_RUN のため送信しません / ${channelIds.length} チャンネル）`);
       console.log(`${text}\n`);
+      continue;
+    }
+
+    if (recordOnly) {
+      console.log(`記録のみ（自動投稿は停止中）: ${slug}`);
+      posted.add(slug);
       continue;
     }
 
