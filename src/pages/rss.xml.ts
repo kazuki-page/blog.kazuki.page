@@ -1,11 +1,8 @@
 import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
-import MarkdownIt from 'markdown-it';
-import sanitizeHtml from 'sanitize-html';
 import { getPublishedPosts, postPath } from '../lib/posts';
+import { renderRssMarkdown } from '../lib/rss-markdown';
 import { RSS_LIMIT } from '../data/reserved-slugs';
-
-const parser = new MarkdownIt();
 
 /**
  * 現行 WordPress に合わせて「最新 RSS_LIMIT 件・全文配信」。
@@ -27,13 +24,7 @@ export async function GET(context: APIContext) {
       pubDate: post.data.date,
       link: postPath(post),
       categories: [post.data.category, ...post.data.tags],
-      content: sanitizeHtml(parser.render(post.body ?? ''), {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-        allowedAttributes: {
-          ...sanitizeHtml.defaults.allowedAttributes,
-          img: ['src', 'alt', 'title', 'width', 'height'],
-        },
-      }),
+      content: renderRssMarkdown(post.body ?? ''),
     })),
   });
 }

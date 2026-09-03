@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "link:content": "node scripts/link-content.mjs",
+    "test": "node --test scripts/test-rss-markdown.ts",
     "validate": "node scripts/validate-content.ts",
     "build": "npm run validate && astro build",
     "preview": "astro preview",
