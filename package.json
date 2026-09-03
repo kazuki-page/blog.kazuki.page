@@ -8,9 +8,9 @@
   "scripts": {
     "dev": "astro dev",
     "link:content": "node scripts/link-content.mjs",
-    "test": "node --test scripts/test-rss-markdown.ts",
+    "test": "node --test scripts/test-rss-markdown.ts scripts/test-tags.ts",
     "validate": "node scripts/validate-content.ts",
-    "build": "npm run validate && astro build",
+    "build": "npm run validate && astro build && node scripts/generate-tag-redirects.ts",
     "preview": "astro preview",
     "astro": "astro"
   },

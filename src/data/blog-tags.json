@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "revision": 1,
+  "updatedAt": "2026-09-04T00:00:00+09:00",
+  "tags": [
+    { "id": "weekly", "name": "週次", "slug": "weekly", "aliases": [] },
+    { "id": "monthly", "name": "月次", "slug": "monthly", "aliases": [] },
+    { "id": "yearly", "name": "年次", "slug": "yearly", "aliases": [] },
+    { "id": "items-and-services", "name": "モノ・サービス", "slug": "items-and-services", "aliases": [] },
+    { "id": "live-stream", "name": "配信", "slug": "live-stream", "aliases": [] },
+    { "id": "about-blog", "name": "ブログについて", "slug": "about-blog", "aliases": [] },
+    { "id": "game", "name": "ゲーム", "slug": "game", "aliases": [] },
+    { "id": "for-me", "name": "自分へ", "slug": "for-me", "aliases": [] },
+    { "id": "whining", "name": "弱音とか", "slug": "whining", "aliases": [] },
+    { "id": "config", "name": "設定", "slug": "config", "aliases": [] },
+    { "id": "wordpress", "name": "WordPress", "slug": "wordpress", "aliases": [] },
+    { "id": "ff12", "name": "FF12", "slug": "ff12", "aliases": [] },
+    { "id": "creation", "name": "創作活動", "slug": "creation", "aliases": [] },
+    { "id": "note", "name": "ノート", "slug": "note", "aliases": [] },
+    { "id": "reading", "name": "読書録", "slug": "reading", "aliases": [] },
+    { "id": "gameplay", "name": "ゲーム実況", "slug": "gameplay", "aliases": [] },
+    { "id": "tweet", "name": "つぶやき", "slug": "tweet", "aliases": [] },
+    { "id": "onimusha-dawn-of-dreams", "name": "新鬼武者", "slug": "onimusha-dawn-of-dreams", "aliases": [] }
+  ]
+}

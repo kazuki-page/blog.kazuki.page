@@ -5,33 +5,33 @@ import Breadcrumb from '../../../components/Breadcrumb.astro';
 import PostList from '../../../components/PostList.astro';
 import Pagination from '../../../components/Pagination.astro';
 import { getPublishedPosts, paginateItems } from '../../../lib/posts';
-import { tags, tagPath, type TagName } from '../../../data/tags';
+import { tagIds, tags, tagPath } from '../../../data/tags';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const posts = await getPublishedPosts();
 
-  return (Object.keys(tags) as TagName[]).map((name) => {
-    const filtered = posts.filter((p) => p.data.tags.includes(name));
+  return tagIds.map((id) => {
+    const filtered = posts.filter((p) => p.data.tags.includes(id));
     const pages = paginateItems(filtered);
 
     return {
-      params: { tag: tags[name].slug },
-      props: { name, items: pages[0].items, totalPages: pages[0].totalPages },
+      params: { tag: tags[id].slug },
+      props: { id, items: pages[0].items, totalPages: pages[0].totalPages },
     };
   });
 };
 
-const { name, items, totalPages } = Astro.props;
-const meta = tags[name];
+const { id, items, totalPages } = Astro.props;
+const meta = tags[id];
 ---
 
-<BaseLayout title={`#${name}`} description={meta.description ?? `${name} の記事一覧。`}>
-  <h1>#{name}</h1>
+<BaseLayout title={`#${meta.name}`} description={meta.description ?? `${meta.name} の記事一覧。`}>
+  <h1>#{meta.name}</h1>
   {meta.description && <p class="desc">{meta.description}</p>}
 
   <PostList posts={items} />
-  <Pagination base={tagPath(name)} page={1} totalPages={totalPages} />
-  <Breadcrumb items={[{ label: 'Tags', href: '/tags/' }, { label: `#${name}` }]} />
+  <Pagination base={tagPath(id)} page={1} totalPages={totalPages} />
+  <Breadcrumb items={[{ label: 'Tags', href: '/tags/' }, { label: `#${meta.name}` }]} />
 </BaseLayout>
 
 <style>

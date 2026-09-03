@@ -41,16 +41,16 @@ Cloudflare 側は Git 連携していない。デプロイの起点は Actions �
 
 ## タクソノミー
 
-カテゴリとタグは「表示名 → slug」のマスタで管理する。
+カテゴリはサイト側のマスタ、タグは leaves の D1 を正本として管理する。
+本番ビルドでは `blog-content/taxonomy/tags.json` を `src/data/blog-tags.json` へ
+配置してから、記事の検証とタグページ生成を行う。
 
 ```ts
-// src/data/tags.ts
-export const tags = {
-  週次: { slug: 'weekly', description: '...' },
-};
+{ "id": "weekly", "name": "週次", "slug": "weekly", "aliases": [], "nameAliases": [] }
 ```
 
-記事の frontmatter には表示名を書き、URL には slug を使う。
+新しい記事の frontmatter には安定IDを書き、表示には name、URLには slug を使う。
+移行前の記事にある表示名も同じIDへ読み替える。
 **マスタに無い名前が現れたらビルドを失敗させる** —— 表記ゆれを検出するため。
 
 ## OGP 画像

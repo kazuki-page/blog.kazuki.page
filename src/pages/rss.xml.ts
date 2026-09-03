@@ -3,6 +3,7 @@ import type { APIContext } from 'astro';
 import { getPublishedPosts, postPath } from '../lib/posts';
 import { renderRssMarkdown } from '../lib/rss-markdown';
 import { RSS_LIMIT } from '../data/reserved-slugs';
+import { tagName } from '../data/tags';
 
 /**
  * 現行 WordPress に合わせて「最新 RSS_LIMIT 件・全文配信」。
@@ -23,7 +24,7 @@ export async function GET(context: APIContext) {
       description: post.data.description,
       pubDate: post.data.date,
       link: postPath(post),
-      categories: [post.data.category, ...post.data.tags],
+      categories: [post.data.category, ...post.data.tags.map(tagName)],
       content: renderRssMarkdown(post.body ?? ''),
     })),
   });

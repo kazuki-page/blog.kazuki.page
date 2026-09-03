@@ -5,36 +5,37 @@ import Breadcrumb from '../../../../components/Breadcrumb.astro';
 import PostList from '../../../../components/PostList.astro';
 import Pagination from '../../../../components/Pagination.astro';
 import { getPublishedPosts, paginateItems } from '../../../../lib/posts';
-import { tags, tagPath, type TagName } from '../../../../data/tags';
+import { tagIds, tags, tagPath } from '../../../../data/tags';
 
 // 1 ページ目は /tags/{tag}/ が担当するので、ここでは 2 ページ目以降だけ。
 export const getStaticPaths: GetStaticPaths = async () => {
   const posts = await getPublishedPosts();
 
-  return (Object.keys(tags) as TagName[]).flatMap((name) => {
-    const filtered = posts.filter((p) => p.data.tags.includes(name));
+  return tagIds.flatMap((id) => {
+    const filtered = posts.filter((p) => p.data.tags.includes(id));
 
     return paginateItems(filtered)
       .filter((p) => p.page > 1)
       .map((p) => ({
-        params: { tag: tags[name].slug, page: String(p.page) },
-        props: { name, ...p },
+        params: { tag: tags[id].slug, page: String(p.page) },
+        props: { id, ...p },
       }));
   });
 };
 
-const { name, page, totalPages, items } = Astro.props;
+const { id, page, totalPages, items } = Astro.props;
+const meta = tags[id];
 ---
 
-<BaseLayout title={`#${name} (${page}ページ目)`} description={tags[name].description} noindex>
-  <h1>#{name}</h1>
+<BaseLayout title={`#${meta.name} (${page}ページ目)`} description={meta.description} noindex>
+  <h1>#{meta.name}</h1>
 
   <PostList posts={items} />
-  <Pagination base={tagPath(name)} page={page} totalPages={totalPages} />
+  <Pagination base={tagPath(id)} page={page} totalPages={totalPages} />
   <Breadcrumb
     items={[
       { label: 'Tags', href: '/tags/' },
-      { label: `#${name}`, href: tagPath(name) },
+      { label: `#${meta.name}`, href: tagPath(id) },
       { label: `${page}ページ目` },
     ]}
   />

@@ -1,7 +1,7 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { categoryNames } from './data/categories';
-import { tagNames } from './data/tags';
+import { isKnownTag, tagId } from './data/tags';
 import { RESERVED_SLUGS, SLUG_PATTERN } from './data/reserved-slugs';
 
 const posts = defineCollection({
@@ -34,8 +34,12 @@ const posts = defineCollection({
       /** カテゴリは必ず 1 つ。マスタに無い名前はエラー */
       category: z.enum(categoryNames),
 
-      /** タグは任意・複数可。マスタに無い名前はエラー */
-      tags: z.array(z.enum(tagNames)).default([]),
+      /** 旧表示名と新しい安定IDを受け、内部ではIDに揃える。未知タグはエラー。 */
+      tags: z.array(
+        z.string()
+          .refine(isKnownTag, { message: 'タグマスタにない値です' })
+          .transform(tagId),
+      ).default([]),
 
       /** OGP / meta description 用 */
       description: z.string().min(1, 'description は必須です'),

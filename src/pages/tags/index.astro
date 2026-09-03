@@ -2,15 +2,14 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import { getPublishedPosts } from '../../lib/posts';
-import { tags, tagPath, type TagName } from '../../data/tags';
+import { tagIds, tags, tagPath } from '../../data/tags';
 
 const posts = await getPublishedPosts();
 
-const entries = (Object.keys(tags) as TagName[])
-  .map((name) => ({
-    name,
-    ...tags[name],
-    count: posts.filter((p) => p.data.tags.includes(name)).length,
+const entries = tagIds
+  .map((id) => ({
+    ...tags[id],
+    count: posts.filter((p) => p.data.tags.includes(id)).length,
   }))
   .filter((t) => t.count > 0)
   .sort((a, b) => b.count - a.count);
@@ -23,7 +22,7 @@ const entries = (Object.keys(tags) as TagName[])
     {
       entries.map((tag) => (
         <li>
-          <a href={tagPath(tag.name)}>#{tag.name}</a>
+          <a href={tagPath(tag.id)}>#{tag.name}</a>
           <span class="count">{tag.count}</span>
           {tag.description && <p class="desc">{tag.description}</p>}
         </li>

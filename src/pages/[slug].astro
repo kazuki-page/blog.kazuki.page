@@ -12,7 +12,7 @@ import {
   toAdjacentLink,
 } from '../lib/posts';
 import { categoryPath } from '../data/categories';
-import { tagPath } from '../data/tags';
+import { tagName, tagPath } from '../data/tags';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const posts = await getPublishedPosts();
@@ -60,7 +60,7 @@ const ogImagePath = ogImage ?? `/og/${postSlug(post)}.png`;
           <ul class="tags">
             {tags.map((tag) => (
               <li>
-                <a href={tagPath(tag)}>#{tag}</a>
+                <a href={tagPath(tag)}>#{tagName(tag)}</a>
               </li>
             ))}
           </ul>

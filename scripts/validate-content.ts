@@ -19,7 +19,7 @@ import matter from 'gray-matter';
 
 import { RESERVED_SLUGS, SLUG_PATTERN } from '../src/data/reserved-slugs.ts';
 import { categories } from '../src/data/categories.ts';
-import { tags } from '../src/data/tags.ts';
+import { resolveTagId } from '../src/data/tags.ts';
 
 const POSTS_DIR = 'src/content/posts';
 const DESCRIPTION_MAX = 160;
@@ -128,8 +128,8 @@ async function main() {
         error(file, 'tags は配列で書いてください（例: tags: ["週次"]）');
       } else {
         for (const tag of data.tags) {
-          if (!(tag in tags)) {
-            error(file, `tag "${tag}" はマスタにありません。src/data/tags.ts に追加してください`);
+          if (!resolveTagId(tag)) {
+            error(file, `tag "${tag}" はマスタにありません。leaves のブログタグへ追加してください`);
           }
         }
         if (new Set(data.tags).size !== data.tags.length) {
