@@ -121,9 +121,22 @@ function trimSpaces(line: string[]): string[] {
   return line.slice(start, end);
 }
 
+/**
+ * Weekly で繰り返し使う「Weekly 日付範囲：」の末尾位置を返す。
+ * 終了日は年を省く通常形と、年を含める形の両方を受け入れる。
+ */
+function weeklyPrefixEnd(chars: string[]): number | null {
+  const match = chars
+    .join('')
+    .match(/^Weekly \d{4}\/\d{1,2}\/\d{1,2}[〜～~](?:\d{4}\/)?\d{1,2}\/\d{1,2}[：:]/u);
+
+  return match ? [...match[0]].length : null;
+}
+
 /** タイトルを 1 行あたり maxEm に収まるよう折り返す */
 function wrapByWidth(chars: string[], maxEm: number): string[][] {
   const lines: string[][] = [];
+  const weeklyBreak = weeklyPrefixEnd(chars);
   let i = 0;
 
   while (i < chars.length) {
@@ -139,6 +152,10 @@ function wrapByWidth(chars: string[], maxEm: number): string[][] {
     if (j === i) j = i + 1;
 
     if (j < chars.length) j = findBreak(chars, i, j, maxEm);
+
+    // 定型の Weekly 見出しの直後に本文が 1 文字だけ残るなら、
+    // その 1 文字を次の行へ送り、タイトル語を途中で孤立させない。
+    if (i === 0 && weeklyBreak !== null && j === weeklyBreak + 1) j = weeklyBreak;
 
     // ここでは空白を落とさない。落とすと行をまたぐ単語の境界が
     // 判定できなくなる（"failed" と "for" が地続きに見えてしまう）。
